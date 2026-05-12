@@ -22,9 +22,13 @@ def get_vote(update, context):
     option_obj.save()
     vote_user(user_id, option_obj, poll_obj)
     # update inline buttons
+    medals = ["🥇", "🥈", "🥉"]
     i_buttons = [
-        [InlineKeyboardButton(text='{} ➖ {}'.format(option.title, option.count), callback_data=str(option.id))]
-        for option in poll_obj.options.filter().order_by('pk')
+        [InlineKeyboardButton(
+            text='{}{} | {}'.format(f'{medals[index]} ' if index <= 2 else '', option.title, option.count),
+            callback_data=str(option.id)
+        )]
+        for index, option in enumerate(poll_obj.options.filter().order_by('-count'), start=0)
     ]
     markup =  InlineKeyboardMarkup(i_buttons)
     bot_edit_message_reply_markup(update, context, reply_markup=markup)
